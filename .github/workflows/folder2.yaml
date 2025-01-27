@@ -1,0 +1,19 @@
+name: List folder2 contents
+
+on:
+  push:
+    paths:
+      - folder2/**
+
+jobs:
+  list-folder2:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: List contents of folder2
+        run: |
+          echo "Contents of folder2:"
+          ls -la folder2
