@@ -17,3 +17,6 @@ jobs:
 
       - name: Display variables.tf
         run: cat variables.tf
+        
+      - name: Display secret 
+        run: echo $secret_text
