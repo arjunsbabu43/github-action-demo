@@ -4,6 +4,13 @@ on:
   push:
     paths:
       - folder1/**
+  workflow_dispatch:
+    inputs:
+      DEBUG:
+        default: false
+        description: Option to send debug to token requestor.
+        required: false
+        type: boolean
 
 jobs:
   list-folder1:
