@@ -1,0 +1,64 @@
+name: 'Terraform Deployment on Ubuntu VM with Managed Identity'
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: [self-hosted, ubuntu]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Install Azure CLI
+      - name: Install Azure CLI
+        run: |
+          if ! command -v az &> /dev/null; then
+            echo "Installing Azure CLI..."
+            curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+          else
+            echo "Azure CLI is already installed."
+          fi
+
+      # Install Terraform
+      - name: Install Terraform
+        run: |
+          if ! command -v terraform &> /dev/null; then
+            echo "Installing Terraform..."
+            sudo apt-get update
+            sudo apt-get install -y gnupg software-properties-common curl
+            curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+            echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+            sudo apt-get update
+            sudo apt-get install -y terraform
+          else
+            echo "Terraform is already installed."
+          fi
+
+      # Azure Login using Managed Identity
+      - name: Azure Login with Managed Identity
+        run: |
+          az login --identity
+
+      # Initialize Terraform
+      - name: Terraform Init
+        run: terraform init
+
+      # Validate Terraform Config
+      - name: Terraform Validate
+        run: terraform validate
+
+      # Plan Terraform Changes
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      # Apply Terraform Changes
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
