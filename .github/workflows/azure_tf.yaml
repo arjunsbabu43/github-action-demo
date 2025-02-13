@@ -2,20 +2,20 @@ name: 'Terraform Deployment from External Repo'
 
 on:
   workflow_dispatch:
-    inputs:
-      git_ent:
-        description: 'GitHub Enterprise Terraform Repo URL'
-        required: true
-      git_ent_org:
-        description: 'GitHub Enterprise Terraform Repo Org'
-        required: true   
-      terraform_repo:
-        description: 'GitHub Enterprise Terraform Repo'
-        required: true          
-      terraform_branch:
-        description: 'Terraform Repo Branch'
-        default: 'master'
-        required: false
+    # inputs:
+    #   git_ent:
+    #     description: 'GitHub Enterprise Terraform Repo URL'
+    #     required: true
+    #   git_ent_org:
+    #     description: 'GitHub Enterprise Terraform Repo Org'
+    #     required: true   
+    #   terraform_repo:
+    #     description: 'GitHub Enterprise Terraform Repo'
+    #     required: true          
+    #   terraform_branch:
+    #     description: 'Terraform Repo Branch'
+    #     default: 'master'
+    #     required: false
 
 permissions:
   id-token: write
