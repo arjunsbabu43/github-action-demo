@@ -3,12 +3,18 @@ name: 'Terraform Deployment from External Repo'
 on:
   workflow_dispatch:
     inputs:
-      terraform_repo_url:
+      git_ent:
         description: 'GitHub Enterprise Terraform Repo URL'
         required: true
+      git_ent_org:
+        description: 'GitHub Enterprise Terraform Repo Org'
+        required: true   
+      terraform_repo:
+        description: 'GitHub Enterprise Terraform Repo'
+        required: true          
       terraform_branch:
         description: 'Terraform Repo Branch'
-        default: 'main'
+        default: 'master'
         required: false
 
 permissions:
@@ -18,43 +24,49 @@ permissions:
 jobs:
   terraform:
     runs-on: self-hosted
+    env:
+      GH_TOKEN: ${{ secrets.GH_IBM_TOKEN }}
+      GH_HOST: ${{ github.ibm.com }}
     steps:
-      - name: Checkout Infrastructure Code
-        run: |
-          echo "Cloning Terraform repo: ${{ inputs.terraform_repo_url }} on branch ${{ inputs.terraform_branch }}"
-          git clone --branch ${{ inputs.terraform_branch }} ${{ inputs.terraform_repo_url }} terraform-repo
-          cd terraform-repo
-          ls -la
+      - name: Check Auth
+        run: gh auth status
 
-      # Install Azure CLI if missing
-      - name: Install Azure CLI
-        run: |
-          if ! command -v az &> /dev/null; then
-            curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-          fi
+      # - name: Checkout Infrastructure Code
+      #   run: |
+      #     echo "Cloning Terraform repo: ${{ inputs.git_ent }}/${{ inputs.git_ent_org }}/${{ inputs.terraform_repo }} on branch ${{ inputs.terraform_branch }}"
+      #     git clone --branch ${{ inputs.terraform_branch }} ${{ inputs.terraform_repo_url }} terraform-repo
+      #     cd terraform-repo
+      #     ls -la
 
-      # Install Terraform if missing
-      - name: Install Terraform
-        run: |
-          if ! command -v terraform &> /dev/null; then
-            sudo apt-get update
-            sudo apt-get install -y gnupg software-properties-common curl
-            curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-            echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-            sudo apt-get update
-            sudo apt-get install -y terraform
-          fi
+      # # Install Azure CLI if missing
+      # - name: Install Azure CLI
+      #   run: |
+      #     if ! command -v az &> /dev/null; then
+      #       curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      #     fi
 
-      # Azure Login with Managed Identity
-      - name: Azure Login with Managed Identity
-        run: |
-          az login --identity
+      # # Install Terraform if missing
+      # - name: Install Terraform
+      #   run: |
+      #     if ! command -v terraform &> /dev/null; then
+      #       sudo apt-get update
+      #       sudo apt-get install -y gnupg software-properties-common curl
+      #       curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+      #       echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+      #       sudo apt-get update
+      #       sudo apt-get install -y terraform
+      #     fi
 
-      # Run Terraform
-      - name: Run Terraform Commands
-        run: |
-          cd terraform-repo
-          terraform init
-          terraform validate
-          terraform plan -out=tfplan
-          terraform apply -auto-approve tfplan
+      # # Azure Login with Managed Identity
+      # - name: Azure Login with Managed Identity
+      #   run: |
+      #     az login --identity
+
+      # # Run Terraform
+      # - name: Run Terraform Commands
+      #   run: |
+      #     cd terraform-repo
+      #     terraform init
+      #     terraform validate
+      #     terraform plan -out=tfplan
+      #     terraform apply -auto-approve tfplan
