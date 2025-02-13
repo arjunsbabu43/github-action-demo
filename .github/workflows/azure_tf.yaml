@@ -37,8 +37,8 @@ jobs:
 
       - name: Checkout Infrastructure Code
         run: |
-              cd iac-pes-rdd-dev-pr
               ls -la
+          # cd iac-pes-rdd-dev-pr
           # echo "Cloning Terraform repo: ${{ inputs.git_ent }}/${{ inputs.git_ent_org }}/${{ inputs.terraform_repo }} on branch ${{ inputs.terraform_branch }}"
           # git clone --branch ${{ inputs.terraform_branch }} ${{ inputs.terraform_repo_url }} terraform-repo
 
