@@ -1,9 +1,6 @@
 name: 'Terraform Deployment on Ubuntu VM with Managed Identity'
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
@@ -12,7 +9,7 @@ permissions:
 
 jobs:
   terraform:
-    runs-on: [self-hosted, ubuntu]
+    runs-on: self-hosted
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
