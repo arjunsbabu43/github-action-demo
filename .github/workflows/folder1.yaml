@@ -14,7 +14,7 @@ on:
 
 jobs:
   list-folder1:
-    runs-on: self-hosted
+    runs-on: azure-ss
     #runs-on: ubuntu-latest
 
     steps:
