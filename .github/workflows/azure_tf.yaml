@@ -24,19 +24,24 @@ permissions:
 jobs:
   terraform:
     runs-on: self-hosted
-    env:
-      GH_TOKEN: ${{ secrets.GH_IBM_TOKEN }}
-      GH_HOST: ${{ github.ibm.com }}
+    # env:
+    #   GH_TOKEN: ${{ secrets.GH_IBM_TOKEN }}
+    #   GH_HOST: ${{ github.ibm.com }}
     steps:
-      - name: Check Auth
-        run: gh auth status
+      - name: Checkout tf Private Repo
+        uses: actions/checkout@v4
+        with:
+          github-server-url: 'https://github.ibm.com'
+          repository: "Platform-Engineering-Services/iac-pes-rdd-dev-pr"
+          token: ${{ secrets.GIT_ENT_TOKEN }} 
 
-      # - name: Checkout Infrastructure Code
-      #   run: |
-      #     echo "Cloning Terraform repo: ${{ inputs.git_ent }}/${{ inputs.git_ent_org }}/${{ inputs.terraform_repo }} on branch ${{ inputs.terraform_branch }}"
-      #     git clone --branch ${{ inputs.terraform_branch }} ${{ inputs.terraform_repo_url }} terraform-repo
-      #     cd terraform-repo
-      #     ls -la
+      - name: Checkout Infrastructure Code
+        run: |
+              cd iac-pes-rdd-dev-pr
+              ls -la
+          # echo "Cloning Terraform repo: ${{ inputs.git_ent }}/${{ inputs.git_ent_org }}/${{ inputs.terraform_repo }} on branch ${{ inputs.terraform_branch }}"
+          # git clone --branch ${{ inputs.terraform_branch }} ${{ inputs.terraform_repo_url }} terraform-repo
+
 
       # # Install Azure CLI if missing
       # - name: Install Azure CLI
