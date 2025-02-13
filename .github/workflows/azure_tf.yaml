@@ -1,7 +1,15 @@
-name: 'Terraform Deployment on Ubuntu VM with Managed Identity'
+name: 'Terraform Deployment from External Repo'
 
 on:
   workflow_dispatch:
+    inputs:
+      terraform_repo_url:
+        description: 'GitHub Enterprise Terraform Repo URL'
+        required: true
+      terraform_branch:
+        description: 'Terraform Repo Branch'
+        default: 'main'
+        required: false
 
 permissions:
   id-token: write
@@ -11,51 +19,42 @@ jobs:
   terraform:
     runs-on: self-hosted
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - name: Checkout Infrastructure Code
+        run: |
+          echo "Cloning Terraform repo: ${{ inputs.terraform_repo_url }} on branch ${{ inputs.terraform_branch }}"
+          git clone --branch ${{ inputs.terraform_branch }} ${{ inputs.terraform_repo_url }} terraform-repo
+          cd terraform-repo
+          ls -la
 
-      # Install Azure CLI
+      # Install Azure CLI if missing
       - name: Install Azure CLI
         run: |
           if ! command -v az &> /dev/null; then
-            echo "Installing Azure CLI..."
             curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-          else
-            echo "Azure CLI is already installed."
           fi
 
-      # Install Terraform
+      # Install Terraform if missing
       - name: Install Terraform
         run: |
           if ! command -v terraform &> /dev/null; then
-            echo "Installing Terraform..."
             sudo apt-get update
             sudo apt-get install -y gnupg software-properties-common curl
             curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
             echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
             sudo apt-get update
             sudo apt-get install -y terraform
-          else
-            echo "Terraform is already installed."
           fi
 
-      # Azure Login using Managed Identity
+      # Azure Login with Managed Identity
       - name: Azure Login with Managed Identity
         run: |
           az login --identity
 
-      # Initialize Terraform
-      - name: Terraform Init
-        run: terraform init
-
-      # Validate Terraform Config
-      - name: Terraform Validate
-        run: terraform validate
-
-      # Plan Terraform Changes
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan
-
-      # Apply Terraform Changes
-      - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+      # Run Terraform
+      - name: Run Terraform Commands
+        run: |
+          cd terraform-repo
+          terraform init
+          terraform validate
+          terraform plan -out=tfplan
+          terraform apply -auto-approve tfplan
