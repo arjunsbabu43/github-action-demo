@@ -35,37 +35,35 @@ jobs:
           repository: "Platform-Engineering-Services/iac-pes-rdd-dev-pr"
           token: ${{ secrets.GIT_ENT_TOKEN }} 
 
-      - name: Checkout Infrastructure Code
-        run: |
-              ls -la
-          # cd iac-pes-rdd-dev-pr
-          # echo "Cloning Terraform repo: ${{ inputs.git_ent }}/${{ inputs.git_ent_org }}/${{ inputs.terraform_repo }} on branch ${{ inputs.terraform_branch }}"
-          # git clone --branch ${{ inputs.terraform_branch }} ${{ inputs.terraform_repo_url }} terraform-repo
-
-
       # Install Azure CLI if missing
       - name: Install Azure CLI
         run: |
           if ! command -v az &> /dev/null; then
             curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
           fi
+          set -x
+          terraform -v
 
       # Install Terraform if missing
-      - name: Install Terraform
-        run: |
-          if ! command -v terraform &> /dev/null; then
-            sudo apt-get update
-            sudo apt-get install -y gnupg software-properties-common curl
-            curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-            echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-            sudo apt-get update
-            sudo apt-get install -y terraform
-          fi
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.1.7"
+      # - name: Install Terraform
+      #   run: |
+      #     if ! command -v terraform &> /dev/null; then
+      #       sudo apt-get update
+      #       sudo apt-get install -y gnupg software-properties-common curl
+      #       curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+      #       echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+      #       sudo apt-get update
+      #       sudo apt-get install -y terraform
+      #     fi
 
       # Azure Login with Managed Identity
       - name: Azure Login with Managed Identity
         run: |
           az login --identity
+          terraform -v
 
       # Run Terraform
       - name: Run Terraform Commands
