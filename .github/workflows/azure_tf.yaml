@@ -45,7 +45,8 @@ jobs:
           terraform -v
 
       # Install Terraform if missing
-      - uses: hashicorp/setup-terraform@v3
+      - name: Install Azure CLI
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.1.7"
       # - name: Install Terraform
@@ -63,12 +64,12 @@ jobs:
       - name: Azure Login with Managed Identity
         run: |
           az login --identity
-          terraform -v
 
       # Run Terraform
       - name: Run Terraform Commands
         run: |
           cd azure_cloud_foundation
+          terraform -v
           terraform init
           terraform validate
           terraform plan
