@@ -2,23 +2,28 @@ name: 'Terraform Deployment from External Repo'
 
 on:
   workflow_dispatch:
-    # inputs:
-    #   git_ent:
-    #     description: 'GitHub Enterprise Terraform Repo URL'
-    #     required: true
-    #   git_ent_org:
-    #     description: 'GitHub Enterprise Terraform Repo Org'
-    #     required: true   
-    #   terraform_repo:
-    #     description: 'GitHub Enterprise Terraform Repo'
-    #     required: true          
-    #   terraform_branch:
-    #     description: 'Terraform Repo Branch'
-    #     default: 'master'
-    #     required: false
+    inputs:
+      git_ent:
+        description: 'GitHub Enterprise Terraform Repo URL'
+        required: true
+      git_ent_org:
+        description: 'GitHub Enterprise Terraform Repo Org'
+        required: true   
+      git_ent_repo:
+        description: 'GitHub Enterprise Terraform Repo'
+        required: true          
+      git_ent_repo_branch:
+        description: 'Terraform Repo Branch'
+        default: 'master'
+        required: false
+      git_ent_repo_tfr_folder:
+        description: 'The folder where the TF repo code exists'
+        required: true    
+      git_ent_repo_wl_folder:
+        description: 'The folder where the TF repo code exists'
+        required: true 
 
 permissions:
-  id-token: write
   contents: read
 
 jobs:
@@ -31,8 +36,8 @@ jobs:
       - name: Checkout tf Private Repo
         uses: actions/checkout@v4
         with:
-          github-server-url: 'https://github.ibm.com'
-          repository: "Platform-Engineering-Services/iac-pes-rdd-dev-pr"
+          github-server-url: ${{ git_ent}}
+          repository: "${{ inputs.git_ent_org }}/{{ inputs.git_ent_repo }}"
           token: ${{ secrets.GIT_ENT_TOKEN }} 
 
       # Install Azure CLI if missing
@@ -42,13 +47,10 @@ jobs:
             curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
           fi
           set -x
+          ls -al
           terraform -v
 
-      # Install Terraform if missing
-      # - name: Install Azure CLI
-      #   uses: hashicorp/setup-terraform@v3
-      #   with:
-      #     terraform_version: "1.10.5"
+
       - name: Install Terraform
         run: |
           if ! command -v terraform &> /dev/null; then
@@ -68,7 +70,10 @@ jobs:
       # Run Terraform
       - name: Run Terraform Commands
         run: |
-          cd azure_cloud_foundation
+          set -x
+          ls -al
+          cp -r ${{ inputs.git_ent_repo_tfr_folder }} ${{ inputs.git_ent_repo_wl_folder }}
+          cd ${{ inputs.git_ent_repo_wl_folder }}
           terraform init
           terraform validate
           terraform plan
