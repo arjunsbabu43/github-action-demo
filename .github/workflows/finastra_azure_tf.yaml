@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           github-server-url: ${{ inputs.git_ent}}
-          repository: "${{ inputs.git_ent_org }}/{{ inputs.git_ent_repo }}"
+          repository: "${{ inputs.git_ent_org }}/${{ inputs.git_ent_repo }}"
           token: ${{ secrets.GIT_ENT_TOKEN }} 
 
       # Install Azure CLI if missing
