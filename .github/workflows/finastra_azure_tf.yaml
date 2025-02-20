@@ -72,8 +72,9 @@ jobs:
         run: |
           set -x
           ls -al
-          cp -r ${{ inputs.git_ent_repo_tfr_folder }} ${{ inputs.git_ent_repo_wl_folder }}
+          cp -r ${{ inputs.git_ent_repo_tfr_folder }}/* ${{ inputs.git_ent_repo_wl_folder }}
           cd ${{ inputs.git_ent_repo_wl_folder }}
+          ls -l
           terraform init
           terraform validate
           terraform plan
