@@ -76,6 +76,7 @@ jobs:
           cd ${{ inputs.git_ent_repo_wl_folder }}
           ls -l
           az login --identity
+          echo tf state sub is $ARM_SUBSCRIPTION_ID
           terraform init
           terraform validate
           terraform plan
