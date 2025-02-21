@@ -77,6 +77,7 @@ jobs:
           ls -l
           az login --identity
           echo tf state sub is $ARM_SUBSCRIPTION_ID
+          export ARM_SUBSCRIPTION_ID=${{ vars.ARM_SUBSCRIPTION_ID }}
           terraform init
           terraform validate
           terraform plan
