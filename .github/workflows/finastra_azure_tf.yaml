@@ -64,7 +64,8 @@ jobs:
       # Azure Login with Managed Identity
       - name: Azure Login with Managed Identity
         run: |
-          az login --identity
+          pwd 
+          whoami
 
       # Run Terraform
       - name: Run Terraform Commands
@@ -74,6 +75,7 @@ jobs:
           cp -r ${{ inputs.git_ent_repo_tfr_folder }}/* ${{ inputs.git_ent_repo_wl_folder }}
           cd ${{ inputs.git_ent_repo_wl_folder }}
           ls -l
+          az login --identity
           terraform init
           terraform validate
           terraform plan
