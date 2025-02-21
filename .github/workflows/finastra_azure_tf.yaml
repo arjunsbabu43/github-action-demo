@@ -80,5 +80,6 @@ jobs:
           export ARM_SUBSCRIPTION_ID=${{ vars.ARM_SUBSCRIPTION_ID }}
           terraform init
           terraform validate
-          terraform plan
+          terraform plan -out tfplan
+          terraform show tfplan
           terraform apply -auto-approve tfplan
