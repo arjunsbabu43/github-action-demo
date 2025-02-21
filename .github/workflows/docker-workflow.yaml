@@ -1,0 +1,25 @@
+name: Run in Docker on Azure Scale Set Runner
+
+on:
+  workflow_dispatch:
+
+
+jobs:
+  docker-job:
+    runs-on: self-hosted  # Uses the Azure Scale Set runner
+    container:
+      image: ubuntu:latest  # Replace with your Docker image
+      options: --user root  # Optional: Run as root if needed
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update && apt-get install -y curl
+
+      - name: Run application inside container
+        run: |
+          echo "Hello from arjun!"
+          sleep 1000
