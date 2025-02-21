@@ -22,4 +22,8 @@ jobs:
       - name: Run application inside container
         run: |
           echo "Hello from arjun!"
-          sleep 1000
+          FILE_PATH="/tmp/arjunnivaan"
+
+          while [ ! -f "$FILE_PATH" ]; 
+            do echo "File not found: $FILE_PATH. Checking again in 5 seconds..."     sleep 5 
+          done echo "File exists: $FILE_PATH"
