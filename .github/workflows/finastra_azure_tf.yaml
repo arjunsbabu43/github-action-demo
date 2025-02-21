@@ -48,7 +48,6 @@ jobs:
           fi
           set -x
           ls -al
-          terraform -v
 
 
       - name: Install Terraform
