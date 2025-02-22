@@ -1,0 +1,85 @@
+
+
+name: 'Finastra Deployment from docker'
+
+on:
+  workflow_dispatch:
+    inputs:
+      git_ent:
+        description: 'GitHub Enterprise Terraform Repo URL'
+        required: true
+      git_ent_org:
+        description: 'GitHub Enterprise Terraform Repo Org'
+        required: true   
+      git_ent_repo:
+        description: 'GitHub Enterprise Terraform Repo'
+        required: true          
+      git_ent_repo_branch:
+        description: 'Terraform Repo Branch'
+        default: 'master'
+        required: false
+      git_ent_repo_tfr_folder:
+        description: 'The folder where the TF repo code exists'
+        required: true    
+      git_ent_repo_wl_folder:
+        description: 'The folder where the TF repo code exists'
+        required: true 
+
+permissions:
+  contents: read
+
+jobs:
+  docker-job:
+    runs-on: self-hosted
+    container: docker.io/ubuntu:noble-20250127
+    # env:
+    #   GH_TOKEN: ${{ secrets.GH_IBM_TOKEN }}
+    #   GH_HOST: ${{ github.ibm.com }}
+    steps:
+      - name: Checkout tf Private Repo
+        uses: actions/checkout@v4
+        with:
+          github-server-url: ${{ inputs.git_ent}}
+          repository: "${{ inputs.git_ent_org }}/${{ inputs.git_ent_repo }}"
+          token: ${{ secrets.GIT_ENT_TOKEN }} 
+
+      # Install Azure CLI if missing
+      - name: Install Azure CLI
+        run: |
+          if ! command -v az &> /dev/null; then
+            curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+          fi
+          set -x
+          ls -al
+
+
+      - name: Install Terraform
+        run: |
+          if ! command -v terraform &> /dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y unzip
+            curl -o terraform.zip https://releases.hashicorp.com/terraform/1.10.5/terraform_1.10.5_linux_amd64.zip && unzip terraform.zip && mv terraform /bin
+
+          fi
+
+      # Azure Login with Managed Identity
+      - name: Azure Login with Managed Identity
+        run: |
+          az login --identity
+
+      # Run Terraform
+      - name: Run Terraform Commands
+        run: |
+          set -x
+          ls -al
+          cp -r ${{ inputs.git_ent_repo_tfr_folder }}/* ${{ inputs.git_ent_repo_wl_folder }}
+          cd ${{ inputs.git_ent_repo_wl_folder }}
+          ls -l
+          
+          echo tf state sub is $ARM_SUBSCRIPTION_ID
+          export ARM_SUBSCRIPTION_ID=${{ vars.ARM_SUBSCRIPTION_ID }}
+          terraform init
+          terraform validate
+          terraform plan -out tfplan
+          terraform show tfplan
+          terraform apply -auto-approve tfplan
