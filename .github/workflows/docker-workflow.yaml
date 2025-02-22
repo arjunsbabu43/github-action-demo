@@ -19,6 +19,7 @@ jobs:
 
       - name: Run application inside container
         run: |
+          #!/bin/bash
           echo "Hello from arjun!"
           FILE_PATH="/tmp/arjunnivaan"
 
@@ -26,4 +27,5 @@ jobs:
           do 
             echo "File not found: $FILE_PATH. Checking again in 5 seconds..."     
             sleep 5 
-          done echo "File exists: $FILE_PATH"
+          done 
+          echo "File exists: $FILE_PATH"
