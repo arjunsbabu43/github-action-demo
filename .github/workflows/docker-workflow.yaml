@@ -8,7 +8,9 @@ jobs:
   docker-job:
     runs-on: self-hosted  # Uses the Azure Scale Set runner
     container: ubuntu:latest  # Replace with your Docker image
-
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.run_id }}
+      cancel-in-progress: false
     steps:
       # - name: Checkout code
       #   uses: actions/checkout@v4
