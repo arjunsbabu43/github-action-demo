@@ -7,7 +7,7 @@ on:
 jobs:
   docker-job:
     runs-on: self-hosted  # Uses the Azure Scale Set runner
-    container: ubuntu:latest  # Replace with your Docker image
+    container: registry.access.redhat.com/ubi9/ubi-minimal:9.5-1739420147  # Replace with your Docker image
     concurrency:
       group: ${{ github.workflow }}-${{ github.run_id }}
       cancel-in-progress: false
