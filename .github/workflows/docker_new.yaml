@@ -1,0 +1,33 @@
+name: docker2
+
+on:
+  workflow_dispatch:
+
+
+jobs:
+  docker-job:
+    runs-on: self-hosted  # Uses the Azure Scale Set runner
+    container: ubuntu:latest  # Replace with your Docker image
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.run_id }}
+      cancel-in-progress: false
+    steps:
+      # - name: Checkout code
+      #   uses: actions/checkout@v4
+
+      # - name: Install dependencies
+      #   run: |
+      #     apt-get update && apt-get install -y curl
+
+      - name: Run application inside container
+        run: |
+          #!/bin/bash
+          echo "Hello from arjun!"
+          FILE_PATH="/tmp/arjunnivaan"
+
+          while [ ! -f "$FILE_PATH" ]
+          do 
+            echo "File not found: $FILE_PATH. Checking again in 5 seconds..."     
+            sleep 5 
+          done 
+          echo "File exists: $FILE_PATH"
