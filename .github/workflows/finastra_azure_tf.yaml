@@ -78,7 +78,7 @@ jobs:
           
           echo tf state sub is $ARM_SUBSCRIPTION_ID
           export ARM_SUBSCRIPTION_ID=${{ vars.ARM_SUBSCRIPTION_ID }}
-          export TF_LOG=DEBUG
+          export TF_LOG=TRACE
 
           terraform init
           terraform validate
