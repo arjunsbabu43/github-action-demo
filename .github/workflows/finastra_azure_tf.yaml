@@ -78,9 +78,6 @@ jobs:
           
           echo tf state sub is $ARM_SUBSCRIPTION_ID
           export ARM_SUBSCRIPTION_ID=${{ vars.ARM_SUBSCRIPTION_ID }}
-          export TF_LOG=TRACE
-          az login --identity
-
           terraform init
           terraform validate
           terraform plan -out tfplan
